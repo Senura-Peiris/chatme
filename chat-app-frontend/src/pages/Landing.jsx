@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import heroImg from "../images/landing hero image.png";
+import heroVideo from '../videos/Intro video.mp4';
 import featureImg from "../images/landing feature search image.png";
 
 const LandingPage = () => {
@@ -127,11 +127,15 @@ const LandingPage = () => {
             </div>
           </div>
 
-          <img
-            src={heroImg}
-            alt="Chat Illustration"
-            className="md:w-1/4 w-full rounded-xl shadow-xl"
-          />
+          <video
+  src={heroVideo}
+  autoPlay
+  loop
+  muted
+  playsInline
+  className="md:w-1/4 w-full rounded-xl shadow-xl"
+/>
+
         </section>
 
         {/* Features Section */}
