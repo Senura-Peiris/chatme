@@ -7,7 +7,7 @@ import Register from './pages/Register';
 import './App.css';
 import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:5000'); // Backend server
+const socket = io('http://localhost:5001'); // Backend server
 
 function App() {
   const [user, setUser] = useState(null);
@@ -23,14 +23,14 @@ function App() {
   // Register user with socket
   useEffect(() => {
     if (user && socket) {
-      socket.emit("register", user._id); // ✅ Register socket on backend
+      socket.emit("register", user._id); 
     }
   }, [user]);
 
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Landingpage />} /> {/* 👈 Changed from Login to Landingpage */}
+        <Route path="/" element={<Landingpage />} /> 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/chat" element={<Chat socket={socket} user={user} />} />

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import heroVideo from '../videos/Intro video.mp4';
-import featurevieo from "../videos/features video.mp4";
+import heroVideo from "../videos/Intro video.mp4";
+import featureVideo from "../videos/features video.mp4"; // Rename your actual file to match
 
 const LandingPage = () => {
   const texts = ["Welcome To Chatme", "Chat with your friends"];
-  const typingSpeed = 100; // ms per letter
+  const typingSpeed = 100;
   const deletingSpeed = 50;
-  const pauseTime = 1500; // pause before deleting or typing next
+  const pauseTime = 1500;
 
   const [textIndex, setTextIndex] = useState(0);
   const [displayedText, setDisplayedText] = useState("");
@@ -17,20 +17,16 @@ const LandingPage = () => {
     let timer;
 
     if (!isDeleting && displayedText.length < texts[textIndex].length) {
-      // Typing
       timer = setTimeout(() => {
         setDisplayedText(texts[textIndex].substring(0, displayedText.length + 1));
       }, typingSpeed);
     } else if (isDeleting && displayedText.length > 0) {
-      // Deleting
       timer = setTimeout(() => {
         setDisplayedText(texts[textIndex].substring(0, displayedText.length - 1));
       }, deletingSpeed);
     } else if (!isDeleting && displayedText.length === texts[textIndex].length) {
-      // Pause then start deleting
       timer = setTimeout(() => setIsDeleting(true), pauseTime);
     } else if (isDeleting && displayedText.length === 0) {
-      // Move to next text and start typing
       setIsDeleting(false);
       setTextIndex((prev) => (prev + 1) % texts.length);
     }
@@ -38,15 +34,15 @@ const LandingPage = () => {
     return () => clearTimeout(timer);
   }, [displayedText, isDeleting, textIndex, texts]);
 
-  // Animations triggers for paragraph and buttons
-  const [showParagraph, setShowParagraph] = React.useState(false);
-  const [showFirstButton, setShowFirstButton] = React.useState(false);
-  const [showSecondButton, setShowSecondButton] = React.useState(false);
+  const [showParagraph, setShowParagraph] = useState(false);
+  const [showFirstButton, setShowFirstButton] = useState(false);
+  const [showSecondButton, setShowSecondButton] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const paraTimeout = setTimeout(() => setShowParagraph(true), 100);
     const btn1Timeout = setTimeout(() => setShowFirstButton(true), 1000);
     const btn2Timeout = setTimeout(() => setShowSecondButton(true), 1600);
+
     return () => {
       clearTimeout(paraTimeout);
       clearTimeout(btn1Timeout);
@@ -62,8 +58,7 @@ const LandingPage = () => {
           className="text-5xl font-bold tracking-wide"
           style={{
             animation: "glow 2s ease-in-out infinite",
-            textShadow:
-              "0 0 10px #3b82f6, 0 0 20px #3b82f6, 0 0 30px #3b82f6",
+            textShadow: "0 0 10px #3b82f6, 0 0 20px #3b82f6, 0 0 30px #3b82f6",
           }}
         >
           Chatme
@@ -87,10 +82,10 @@ const LandingPage = () => {
         {/* Hero Section */}
         <section className="flex flex-col-reverse md:flex-row items-center justify-center px-10 md:px-24 py-16 gap-10">
           <div className="md:w-1/2">
-          <h2
-  className="text-4xl md:text-5xl font-bold mb-6 leading-tight min-w-[22ch] text-center md:text-left"
-  aria-live="polite"
->
+            <h2
+              className="text-4xl md:text-5xl font-bold mb-6 leading-tight min-w-[22ch] text-center md:text-left"
+              aria-live="polite"
+            >
               {displayedText.includes("Chatme") ? (
                 <>
                   {displayedText.replace("Chatme", "")}
@@ -103,13 +98,13 @@ const LandingPage = () => {
             </h2>
 
             {showParagraph && (
-             <p className="text-lg text-gray-300 mb-6 animate-slideInLeft mt-10 text-center md:text-left">
+              <p className="text-lg text-gray-300 mb-6 animate-slideInLeft mt-10 text-center md:text-left">
                 Connect instantly with friends, colleagues, and communities using
                 blazing fast, secure, and intelligent messaging.
               </p>
             )}
 
-<div className="flex flex-wrap gap-4 justify-center sm:justify-start">
+            <div className="flex flex-wrap gap-4 justify-center sm:justify-start">
               {showFirstButton && (
                 <Link to="/login">
                   <button className="border border-white text-white px-4 py-2 rounded hover:bg-white hover:text-black transition animate-slideInLeft">
@@ -128,14 +123,13 @@ const LandingPage = () => {
           </div>
 
           <video
-  src={heroVideo}
-  autoPlay
-  loop
-  muted
-  playsInline
-  className="md:w-1/2 w-full rounded-xl shadow-xl"
-/>
-
+            src={heroVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="md:w-1/2 w-full rounded-xl shadow-xl"
+          />
         </section>
 
         {/* Features Section */}
@@ -150,20 +144,17 @@ const LandingPage = () => {
 
           <div className="flex justify-center">
             <div className="bg-[#1f2937] border border-gray-700 rounded-2xl shadow-xl p-8 w-full md:w-4/5 lg:w-3/4 flex flex-col md:flex-row items-center gap-8">
-              {/* Image Left */}
               <div className="w-full md:w-1/2 flex justify-center">
-              <video
-  src={featurevieo}
-  autoPlay
-  loop
-  muted
-  playsInline
-  className="w-3/4 md:w-full rounded-xl shadow-xl"
-/>
-
+                <video
+                  src={featureVideo}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-3/4 md:w-full rounded-xl shadow-xl"
+                />
               </div>
 
-              {/* List Right */}
               <div className="w-full md:w-1/2">
                 <ul className="space-y-6 text-lg text-gray-300 text-left">
                   <li>✅ Real-time one-on-one & group messaging</li>
@@ -183,7 +174,7 @@ const LandingPage = () => {
         © {new Date().getFullYear()} Chatme. All rights reserved.
       </footer>
 
-      {/* Styles */}
+      {/* Custom Animations */}
       <style>{`
         @keyframes glow {
           0% { text-shadow: 0 0 5px #3b82f6; }
