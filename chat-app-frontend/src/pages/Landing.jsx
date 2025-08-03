@@ -4,7 +4,7 @@ import heroVideo from '../videos/Intro video.mp4';
 import featurevieo from "../videos/features video.mp4";
 
 const LandingPage = () => {
-  const texts = ["Welcome To Chatme", "Chat with your friends now"];
+  const texts = ["Welcome To Chatme", "Chat with your friends"];
   const typingSpeed = 100; // ms per letter
   const deletingSpeed = 50;
   const pauseTime = 1500; // pause before deleting or typing next
@@ -87,10 +87,10 @@ const LandingPage = () => {
         {/* Hero Section */}
         <section className="flex flex-col-reverse md:flex-row items-center justify-center px-10 md:px-24 py-16 gap-10">
           <div className="md:w-1/2">
-            <h2
-              className="text-4xl md:text-5xl font-bold mb-6 leading-tight min-w-[22ch]"
-              aria-live="polite"
-            >
+          <h2
+  className="text-4xl md:text-5xl font-bold mb-6 leading-tight min-w-[22ch] text-center md:text-left"
+  aria-live="polite"
+>
               {displayedText.includes("Chatme") ? (
                 <>
                   {displayedText.replace("Chatme", "")}
@@ -103,13 +103,13 @@ const LandingPage = () => {
             </h2>
 
             {showParagraph && (
-              <p className="text-lg text-gray-300 mb-6 animate-slideInLeft mt-10">
+             <p className="text-lg text-gray-300 mb-6 animate-slideInLeft mt-10 text-center md:text-left">
                 Connect instantly with friends, colleagues, and communities using
                 blazing fast, secure, and intelligent messaging.
               </p>
             )}
 
-            <div className="flex flex-wrap gap-4">
+<div className="flex flex-wrap gap-4 justify-center sm:justify-start">
               {showFirstButton && (
                 <Link to="/login">
                   <button className="border border-white text-white px-4 py-2 rounded hover:bg-white hover:text-black transition animate-slideInLeft">
@@ -133,7 +133,7 @@ const LandingPage = () => {
   loop
   muted
   playsInline
-  className="md:w-1/4 w-full rounded-xl shadow-xl"
+  className="md:w-1/2 w-full rounded-xl shadow-xl"
 />
 
         </section>
