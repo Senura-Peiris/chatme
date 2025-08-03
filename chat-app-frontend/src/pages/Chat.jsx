@@ -26,7 +26,7 @@ function Chat({ socket }) {
     }
 
     axios
-      .get("http://localhost:5000/api/auth/me", {
+      .get("http://localhost:5001/api/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -64,7 +64,7 @@ function Chat({ socket }) {
 
   const fetchFriends = async (userId, token) => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/friends/${userId}`, {
+      const res = await axios.get(`http://localhost:5001/api/friends/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setFriends(res.data.friends);
@@ -75,7 +75,7 @@ function Chat({ socket }) {
 
   const fetchChats = async (userId, token) => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/chats/${userId}`, {
+      const res = await axios.get(`http://localhost:5001/api/chats/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setChats(res.data.chats);
@@ -90,7 +90,7 @@ function Chat({ socket }) {
     const token = localStorage.getItem("token");
     try {
       await axios.post(
-        "http://localhost:5000/api/friends/invite-email", // Backend email invite endpoint
+        "http://localhost:5001/api/friends/invite-email", // Backend email invite endpoint
         {
           toEmail: friendEmail,
           senderName: user.username,
@@ -116,7 +116,7 @@ function Chat({ socket }) {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`http://localhost:5000/api/users/search?query=${query}`, {
+      const res = await axios.get(`http://localhost:5001/api/users/search?query=${query}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const filtered = res.data.users.filter((u) => u._id !== user._id);
@@ -130,7 +130,7 @@ function Chat({ socket }) {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await axios.get(`http://localhost:5000/api/users/${friendId}`, {
+      const res = await axios.get(`http://localhost:5001/api/users/${friendId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -155,7 +155,7 @@ function Chat({ socket }) {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        "http://localhost:5000/api/friends/accept",
+        "http://localhost:5001/api/friends/accept",
         { fromUserId: incomingInvite.id },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -240,7 +240,7 @@ function Chat({ socket }) {
           {user && (
             <div className="relative flex items-center space-x-3" ref={dropdownRef}>
               <img
-                src={`http://localhost:5000/uploads/${user.profileImage}`}
+                src={`http://localhost:5001/uploads/${user.profileImage}`}
                 alt="profile"
                 className="w-10 h-10 rounded-full cursor-pointer object-cover border-2 border-blue-500"
                 onClick={toggleDropdown}
@@ -339,7 +339,7 @@ function Chat({ socket }) {
                       onClick={() => startChatWithUser(result._id)}
                     >
                       <img
-                        src={`http://localhost:5000/uploads/${result.profileImage}`}
+                        src={`http://localhost:5001/uploads/${result.profileImage}`}
                         alt={`${result.username} profile`}
                         className="w-8 h-8 rounded-full object-cover"
                       />
@@ -360,7 +360,7 @@ function Chat({ socket }) {
                       className="bg-gray-800 p-2 rounded flex items-center space-x-3"
                     >
                       <img
-                        src={`http://localhost:5000/uploads/${friend.profileImage}`}
+                        src={`http://localhost:5001/uploads/${friend.profileImage}`}
                         alt={`${friend.username} profile`}
                         className="w-8 h-8 rounded-full object-cover"
                       />
@@ -395,7 +395,7 @@ function Chat({ socket }) {
                     className="bg-gray-800 p-2 rounded cursor-pointer hover:bg-gray-700 flex items-center space-x-3"
                   >
                     <img
-                      src={`http://localhost:5000/uploads/${chat.friend.profileImage}`}
+                      src={`http://localhost:5001/uploads/${chat.friend.profileImage}`}
                       alt={`${chat.friend.username} profile`}
                       className="w-8 h-8 rounded-full object-cover"
                     />
