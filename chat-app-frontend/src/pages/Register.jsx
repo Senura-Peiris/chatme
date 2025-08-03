@@ -19,14 +19,18 @@ function Register() {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/auth/register", formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      await axios.post(
+        "https://chatme-application.up.railway.app/api/auth/register",
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        }
+      );
 
       setSuccessMessage("✅ Registration successful! Redirecting...");
       setTimeout(() => {
         window.location.href = "/login";
-      }, 1500); // 1.5 seconds delay before redirect
+      }, 1500);
 
     } catch (error) {
       console.error("Registration failed:", error.response?.data || error.message);

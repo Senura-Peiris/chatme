@@ -15,10 +15,13 @@ function Login() {
     setError('');
     setLoading(true);
     try {
-      const res = await axios.post('/api/auth/login', { email, password });
+      const res = await axios.post(
+        "https://chatme-application.up.railway.app/api/auth/login",
+        { email, password }
+      );
       localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user)); // ✅ store user
-      navigate('/chat');      
+      localStorage.setItem('user', JSON.stringify(res.data.user));
+      navigate('/chat');
     } catch (err) {
       console.error('Login error:', err);
       setError('Login failed. Please check your credentials.');
