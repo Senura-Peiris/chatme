@@ -1,0 +1,13 @@
+{
+    "build": {
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "command": "cd chat-app-backend && npm install",
+      "output": null
+    },
+    "deploy": {
+      "startCommand": "cd chat-app-backend && node server.js"
+    }
+  }
+  

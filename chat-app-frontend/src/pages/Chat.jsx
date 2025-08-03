@@ -228,7 +228,7 @@ function Chat({ socket }) {
       <aside className="w-72 bg-gray-800 flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700">
           <h2
-            className="text-3xl font-bold text-blue-400 relative z-10 cursor-pointer"
+            className="text-4xl font-bold text-white relative z-10 cursor-pointer"
             style={{
               animation: "glow 2s ease-in-out infinite",
               textShadow: "0 0 10px #3b82f6, 0 0 20px #3b82f6, 0 0 30px #3b82f6",
