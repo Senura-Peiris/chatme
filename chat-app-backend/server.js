@@ -8,13 +8,11 @@ const { Server } = require('socket.io');
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-// Routes
 const usersRoutes = require('./routes/users');
 const authRoutes = require('./routes/auth');
 const friendsRoutes = require('./routes/friends');
 const notificationRoutes = require('./routes/notifications');
 
-// Models
 const Notification = require('./models/Notification');
 
 const app = express();
@@ -24,10 +22,10 @@ const server = http.createServer(app);
 app.use(cors());
 app.use(express.json());
 
-// Static files
+// Serve static uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Root route to confirm server is working
+// Root route for health check
 app.get('/', (req, res) => {
   console.log('👀 GET / received');
   res.send('🚀 Chatme backend is deployed and running on Railway!');
@@ -39,7 +37,7 @@ app.use('/api/users', usersRoutes);
 app.use('/api/friends', friendsRoutes);
 app.use('/api/notifications', notificationRoutes);
 
-// Socket.IO setup
+// Socket.IO setup with CORS allowing all origins (adjust for production as needed)
 const io = new Server(server, {
   cors: {
     origin: '*',
@@ -49,19 +47,17 @@ const io = new Server(server, {
 
 app.set('io', io);
 
-// In-memory map of connected users (userId -> socketId)
+// Map to keep track of connected users
 const connectedUsers = new Map();
 
 io.on('connection', (socket) => {
   console.log('🔌 New client connected:', socket.id);
 
-  // Register user by ID
   socket.on('register', (userId) => {
     connectedUsers.set(userId, socket.id);
     console.log(`✅ Registered user: ${userId} with socket: ${socket.id}`);
   });
 
-  // Handle chat invite
   socket.on('send_invite', async ({ from, to }) => {
     const toSocketId = connectedUsers.get(to.id);
 
@@ -84,7 +80,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Handle invite acceptance
   socket.on('accept_invite', ({ from, to }) => {
     const fromSocketId = connectedUsers.get(from);
     if (fromSocketId) {
@@ -93,7 +88,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Handle private message
   socket.on('send-private-message', ({ to, message }) => {
     const toSocketId = connectedUsers.get(to);
     if (toSocketId) {
@@ -104,7 +98,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Handle disconnect
   socket.on('disconnect', () => {
     for (const [userId, sockId] of connectedUsers.entries()) {
       if (sockId === socket.id) {
@@ -116,11 +109,8 @@ io.on('connection', (socket) => {
   });
 });
 
-// MongoDB connection
-mongoose.connect(process.env.ATLAS_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+// MongoDB connection with updated mongoose options (you can remove deprecated options)
+mongoose.connect(process.env.ATLAS_URI)
   .then(async () => {
     console.log('✅ Connected to MongoDB Atlas');
     const db = mongoose.connection.db;
@@ -136,7 +126,7 @@ mongoose.connect(process.env.ATLAS_URI, {
   })
   .catch((err) => console.error('❌ MongoDB connection error:', err));
 
-// Start the server
+// Listen on Railway's port or 5001 for local dev
 const PORT = process.env.PORT || 5001;
 server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
