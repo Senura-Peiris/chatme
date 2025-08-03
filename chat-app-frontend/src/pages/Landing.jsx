@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import heroVideo from '../videos/Intro video.mp4';
-import featureImg from "../images/landing feature search image.png";
+import featurevieo from "../videos/features video.mp4";
 
 const LandingPage = () => {
   const texts = ["Welcome To Chatme", "Chat with your friends now"];
@@ -152,11 +152,15 @@ const LandingPage = () => {
             <div className="bg-[#1f2937] border border-gray-700 rounded-2xl shadow-xl p-8 w-full md:w-4/5 lg:w-3/4 flex flex-col md:flex-row items-center gap-8">
               {/* Image Left */}
               <div className="w-full md:w-1/2 flex justify-center">
-                <img
-                  src={featureImg}
-                  alt="AI Chat Features"
-                  className="w-3/4 md:w-full rounded-xl shadow-xl"
-                />
+              <video
+  src={featurevieo}
+  autoPlay
+  loop
+  muted
+  playsInline
+  className="w-3/4 md:w-full rounded-xl shadow-xl"
+/>
+
               </div>
 
               {/* List Right */}
