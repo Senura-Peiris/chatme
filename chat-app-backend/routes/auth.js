@@ -8,21 +8,21 @@ const User = require('../models/User');
 
 const router = express.Router();
 
-// ✅ Use environment variable for JWT
+// Use environment variable for JWT secret or default
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecurechatappkey123!';
 
-// ✅ Ensure uploads directory exists
+// Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, '..', 'uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// ✅ Multer storage configuration
+// Multer storage config for profile image uploads
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
+  destination: (req, file, cb) => {
     cb(null, uploadsDir);
   },
-  filename: function (req, file, cb) {
+  filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
     const uniqueName = `${file.fieldname}-${Date.now()}${ext}`;
     cb(null, uniqueName);
@@ -30,9 +30,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// -------------------------
-// ✅ POST /api/auth/register
-// -------------------------
+// POST /api/auth/register
 router.post('/register', upload.single('profileImage'), async (req, res) => {
   try {
     const { email, username, password } = req.body;
@@ -42,28 +40,32 @@ router.post('/register', upload.single('profileImage'), async (req, res) => {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
+    // Check if email is already registered
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({ error: 'Email already registered' });
     }
 
+    // Hash the password securely
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Create and save new user
     const newUser = new User({
       email,
       username,
       password: hashedPassword,
       profileImage
     });
+    await newUser.save();
 
-    await newUser.save(); // ✅ saves in users collection
-
+    // Create JWT token
     const token = jwt.sign(
       { userId: newUser._id, username: newUser.username },
       JWT_SECRET,
       { expiresIn: '1h' }
     );
 
+    // Return success response with token and user info (without password)
     res.status(201).json({
       message: 'User registered successfully',
       token,
@@ -81,25 +83,27 @@ router.post('/register', upload.single('profileImage'), async (req, res) => {
   }
 });
 
-// -------------------------
-// ✅ POST /api/auth/login
-// -------------------------
+// POST /api/auth/login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    // Find user by email
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ error: 'User not found' });
 
+    // Compare provided password with stored hash
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ error: 'Invalid credentials' });
 
+    // Generate JWT token
     const token = jwt.sign(
       { userId: user._id, username: user.username },
       JWT_SECRET,
       { expiresIn: '1h' }
     );
 
+    // Return user info and token
     res.status(200).json({
       message: 'Login successful',
       token,
@@ -117,9 +121,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// -------------------------
-// ✅ Middleware: Verify token
-// -------------------------
+// Middleware: verify JWT token
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ error: "No token provided" });
@@ -132,14 +134,11 @@ const authMiddleware = (req, res, next) => {
   });
 };
 
-// -------------------------
-// ✅ GET /api/auth/me
-// -------------------------
+// GET /api/auth/me (protected route to get logged-in user info)
 router.get('/me', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user.userId).select('-password');
     if (!user) return res.status(404).json({ error: "User not found" });
-
     res.json({ user });
   } catch (err) {
     console.error("Fetch user error:", err);
