@@ -21,8 +21,14 @@ const Notification = require('./models/Notification');
 const app = express();
 const server = http.createServer(app);
 
-// Middleware
-app.use(cors()); // Consider restricting origin in production
+// CORS configuration
+const corsOptions = {
+  origin: 'http://localhost:5173', // allow your frontend origin here
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true, // if you use cookies or authorization headers
+};
+
+app.use(cors(corsOptions)); // Apply CORS with options
 app.use(express.json());
 
 // Serve uploaded images statically
@@ -40,10 +46,10 @@ app.use('/api/users', usersRoutes);
 app.use('/api/friends', friendsRoutes);
 app.use('/api/notifications', notificationRoutes);
 
-// Socket.IO setup with CORS allowing all origins (adjust in production)
+// Socket.IO setup with CORS allowing the same origin as above
 const io = new Server(server, {
   cors: {
-    origin: '*', 
+    origin: 'http://localhost:5173',
     methods: ['GET', 'POST'],
   },
 });
