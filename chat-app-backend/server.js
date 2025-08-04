@@ -6,8 +6,8 @@ const path = require('path');
 const http = require('http');
 const { Server } = require('socket.io');
 
-// Load environment variables
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+// Load .env from current directory (chat-app-backend/.env)
+dotenv.config({ path: path.resolve(__dirname, './.env') });
 
 const usersRoutes = require('./routes/users');
 const authRoutes = require('./routes/auth');
