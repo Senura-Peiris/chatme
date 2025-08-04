@@ -30,9 +30,7 @@ function Register() {
       }
 
       const res = await axios.post(`${API_URL}/auth/register`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       localStorage.setItem('token', res.data.token);
@@ -40,9 +38,7 @@ function Register() {
       navigate('/chat');
     } catch (err) {
       console.error('Registration error:', err.response || err);
-      setError(
-        err.response?.data?.error || 'Registration failed. Please try again.'
-      );
+      setError(err.response?.data?.error || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -55,8 +51,7 @@ function Register() {
           className="text-5xl font-extrabold mb-8 cursor-default select-none"
           style={{
             animation: 'glow 2.5s ease-in-out infinite',
-            textShadow:
-              '0 0 10px #a855f7, 0 0 25px #d946ef, 0 0 40px #ec4899',
+            textShadow: '0 0 10px #a855f7, 0 0 25px #d946ef, 0 0 40px #ec4899',
           }}
         >
           Chatme
