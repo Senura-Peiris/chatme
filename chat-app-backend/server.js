@@ -23,7 +23,6 @@ const server = http.createServer(app);
 const allowedOrigins = [
   'http://localhost:5173',
   'https://chatme-production-6ae4.up.railway.app/', // backend itself
-  'https://your-frontend-url-if-you-host-it.netlify.app', // optional
 ];
 
 const corsOptions = {
