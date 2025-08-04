@@ -20,7 +20,6 @@ function Register() {
     setLoading(true);
 
     try {
-      // Prepare form data
       const formData = new FormData();
       formData.append('email', email);
       formData.append('username', username);
@@ -94,7 +93,6 @@ function Register() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        {/* Profile image upload */}
         <input
           type="file"
           accept="image/*"
@@ -120,7 +118,6 @@ function Register() {
         </p>
       </div>
 
-      {/* Animation keyframes */}
       <style>{`
         @keyframes glow {
           0% { text-shadow: 0 0 5px #a855f7; }

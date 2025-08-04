@@ -8,7 +8,7 @@ const User = require('../models/User');
 
 const router = express.Router();
 
-// Use environment variable for JWT secret or default
+// JWT secret
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecurechatappkey123!';
 
 // Ensure uploads directory exists
@@ -17,11 +17,9 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// Multer storage config for profile image uploads
+// Multer config
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadsDir);
-  },
+  destination: (req, file, cb) => cb(null, uploadsDir),
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
     const uniqueName = `${file.fieldname}-${Date.now()}${ext}`;
@@ -33,6 +31,9 @@ const upload = multer({ storage });
 // POST /api/auth/register
 router.post('/register', upload.single('profileImage'), async (req, res) => {
   try {
+    console.log('req.body:', req.body);
+    console.log('req.file:', req.file);
+
     const { email, username, password } = req.body;
     const profileImage = req.file ? req.file.filename : null;
 
@@ -40,16 +41,13 @@ router.post('/register', upload.single('profileImage'), async (req, res) => {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-    // Check if email is already registered
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({ error: 'Email already registered' });
     }
 
-    // Hash the password securely
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create and save new user
     const newUser = new User({
       email,
       username,
@@ -58,14 +56,12 @@ router.post('/register', upload.single('profileImage'), async (req, res) => {
     });
     await newUser.save();
 
-    // Create JWT token
     const token = jwt.sign(
       { userId: newUser._id, username: newUser.username },
       JWT_SECRET,
       { expiresIn: '1h' }
     );
 
-    // Return success response with token and user info (without password)
     res.status(201).json({
       message: 'User registered successfully',
       token,
@@ -76,10 +72,9 @@ router.post('/register', upload.single('profileImage'), async (req, res) => {
         profileImage: newUser.profileImage
       }
     });
-
   } catch (err) {
     console.error('Registration error:', err);
-    res.status(500).json({ error: 'Server error during registration' });
+    res.status(500).json({ error: 'Server error during registration', details: err.message });
   }
 });
 
@@ -88,22 +83,18 @@ router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Find user by email
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ error: 'User not found' });
 
-    // Compare provided password with stored hash
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ error: 'Invalid credentials' });
 
-    // Generate JWT token
     const token = jwt.sign(
       { userId: user._id, username: user.username },
       JWT_SECRET,
       { expiresIn: '1h' }
     );
 
-    // Return user info and token
     res.status(200).json({
       message: 'Login successful',
       token,
@@ -134,7 +125,7 @@ const authMiddleware = (req, res, next) => {
   });
 };
 
-// GET /api/auth/me (protected route to get logged-in user info)
+// GET /api/auth/me
 router.get('/me', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user.userId).select('-password');
