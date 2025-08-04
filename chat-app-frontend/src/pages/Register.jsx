@@ -37,8 +37,20 @@ function Register() {
       localStorage.setItem('user', JSON.stringify(res.data.user));
       navigate('/chat');
     } catch (err) {
-      console.error('Registration error:', err.response || err);
-      setError(err.response?.data?.error || 'Registration failed. Please try again.');
+      if (err.response) {
+        // Server responded with a status other than 2xx
+        console.error('Registration error response:', err.response.data);
+        setError(err.response.data.error || err.response.data.message || 'Registration failed. Please try again.');
+      } else if (err.request) {
+        // Request was made but no response
+        console.error('No response received:', err.request);
+        setError('No response from server. Please try again later.');
+      } else {
+        // Something else happened
+        console.error('Error setting up request:', err.message);
+        setError('Registration failed. Please try again.');
+      }
+      setLoading(false);
     } finally {
       setLoading(false);
     }
