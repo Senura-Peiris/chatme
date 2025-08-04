@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import LoginImg from '../images/login.webp';
+import LoginVideo from '../videos/Login.mp4';
 
 const API_URL = "https://chatme-production-6ae4.up.railway.app/api";
 
@@ -46,11 +46,16 @@ function Login() {
           Chatme
         </h1>
 
-        <img
-          src={LoginImg}
-          alt="Chatme Illustration"
-          className="w-full h-auto rounded mb-4"
-        />
+        <video
+  src={LoginVideo} // Make sure to import or define LoginVideo correctly
+  autoPlay
+  loop
+  muted
+  playsInline
+  className="w-full h-auto rounded mb-4"
+>
+  Your browser does not support the video tag.
+</video>
 
         <h2 className="text-2xl font-bold mb-4 text-blue-700">Login</h2>
 

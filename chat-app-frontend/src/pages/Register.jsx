@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import RegisterImg from '../images/register.webp';
+import RegisterVideo from '../videos/Register.mp4';
 
 const API_URL = "https://chatme-production-6ae4.up.railway.app/api";
 
@@ -57,11 +57,17 @@ function Register() {
           Chatme
         </h1>
 
-        <img
-          src={RegisterImg}
-          alt="Register Illustration"
-          className="w-full h-auto rounded mb-4"
-        />
+        <video
+  src={RegisterVideo} // Make sure to import or define RegisterVideo correctly
+  autoPlay
+  loop
+  muted
+  playsInline
+  className="w-full h-auto rounded mb-4"
+>
+  Your browser does not support the video tag.
+</video>
+
 
         <h2 className="text-2xl font-bold mb-4 text-pink-700">Register</h2>
 
