@@ -17,23 +17,33 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// Multer config
+// Multer config for profile image upload
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadsDir),
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
-    const uniqueName = `${file.fieldname}-${Date.now()}${ext}`;
+    const uniqueName = `profileImage-${Date.now()}${ext}`;
     cb(null, uniqueName);
   }
 });
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    // Only accept image types
+    const allowedTypes = /jpeg|jpg|png|webp/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    if (extname && mimetype) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Only image files (jpg, jpeg, png, webp) are allowed'));
+    }
+  }
+});
 
 // POST /api/auth/register
 router.post('/register', upload.single('profileImage'), async (req, res) => {
   try {
-    console.log('req.body:', req.body);
-    console.log('req.file:', req.file);
-
     const { email, username, password } = req.body;
     const profileImage = req.file ? req.file.filename : null;
 
@@ -54,6 +64,7 @@ router.post('/register', upload.single('profileImage'), async (req, res) => {
       password: hashedPassword,
       profileImage
     });
+
     await newUser.save();
 
     const token = jwt.sign(
@@ -74,7 +85,10 @@ router.post('/register', upload.single('profileImage'), async (req, res) => {
     });
   } catch (err) {
     console.error('Registration error:', err);
-    res.status(500).json({ error: 'Server error during registration', details: err.message });
+    res.status(500).json({
+      error: 'Server error during registration',
+      details: err.message
+    });
   }
 });
 
