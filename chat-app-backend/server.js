@@ -90,9 +90,19 @@ mongoose
   })
   .then(async () => {
     console.log('✅ Connected to MongoDB Atlas');
+
+    const db = mongoose.connection.db;
+    console.log('🗄️ Connected database:', db.databaseName);
+
+    const collections = await db.listCollections().toArray();
+    console.log('📚 Collections in database:');
+    collections.forEach((col) => console.log(' -', col.name));
+
+    console.log('🚆 Railway deployment connected and running!');
   })
   .catch((err) => {
-    console.error('❌ MongoDB connection error:', err);
+    console.error('❌ MongoDB connection error on Railway deployment:', err.message);
+    console.error('❌ Railway deployment is NOT connected or there is a MongoDB connection issue.');
   });
 
 const PORT = process.env.PORT || 5001;
