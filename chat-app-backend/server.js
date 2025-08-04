@@ -6,23 +6,19 @@ const path = require('path');
 const http = require('http');
 const { Server } = require('socket.io');
 
-// Load environment variables from backend/.env
+// Load environment variables
 dotenv.config({ path: path.resolve(__dirname, './.env') });
-
-const usersRoutes = require('./routes/users');
-const authRoutes = require('./routes/auth');
-const friendsRoutes = require('./routes/friends');
-const notificationRoutes = require('./routes/notifications');
 
 const app = express();
 const server = http.createServer(app);
 
+// Allowed frontend origins
 const allowedOrigins = [
   'http://localhost:5173',
   'https://chatme-production-6ae4.up.railway.app',
-  // Add your frontend URLs here
 ];
 
+// CORS setup
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -37,19 +33,29 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// ✅ Serve profile images or any uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Test base route
 app.get('/', (req, res) => {
   res.send('🚀 Chatme backend is running!');
 });
 
-// API routes
+// Import routes
+const authRoutes = require('./routes/auth');
+const usersRoutes = require('./routes/users');
+const friendsRoutes = require('./routes/friends');
+const notificationRoutes = require('./routes/notifications');
+
+// Use routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/friends', friendsRoutes);
 app.use('/api/notifications', notificationRoutes);
 
-// Socket.io setup
+// Socket.IO setup
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
@@ -69,7 +75,7 @@ io.on('connection', (socket) => {
     console.log(`✅ Registered user: ${userId} with socket: ${socket.id}`);
   });
 
-  // Add your socket events here...
+  // Add more socket events here...
 
   socket.on('disconnect', () => {
     for (const [userId, sockId] of connectedUsers.entries()) {
@@ -81,13 +87,13 @@ io.on('connection', (socket) => {
     }
   });
 });
-console.log('Mongo URI:', process.env.ATLAS_URI);
 
 // MongoDB connection
+console.log('Mongo URI:', process.env.ATLAS_URI);
+
 mongoose
   .connect(process.env.ATLAS_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+    dbName: 'Chatme',
   })
   .then(async () => {
     console.log('✅ Connected to MongoDB Atlas');
@@ -106,6 +112,7 @@ mongoose
     console.error('❌ Railway deployment is NOT connected or there is a MongoDB connection issue.');
   });
 
+// Start server
 const PORT = process.env.PORT || 5001;
 server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
