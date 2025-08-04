@@ -81,6 +81,7 @@ io.on('connection', (socket) => {
     }
   });
 });
+console.log('Mongo URI:', process.env.ATLAS_URI);
 
 // MongoDB connection
 mongoose
