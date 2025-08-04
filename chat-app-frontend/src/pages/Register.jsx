@@ -9,6 +9,7 @@ function Register() {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [profileImage, setProfileImage] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -17,18 +18,32 @@ function Register() {
   const handleRegister = async () => {
     setError('');
     setLoading(true);
+
     try {
-      const res = await axios.post(`${API_URL}/auth/register`, {
-        email,
-        username,
-        password,
+      // Prepare form data
+      const formData = new FormData();
+      formData.append('email', email);
+      formData.append('username', username);
+      formData.append('password', password);
+
+      if (profileImage) {
+        formData.append('profileImage', profileImage);
+      }
+
+      const res = await axios.post(`${API_URL}/auth/register`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
+
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
       navigate('/chat');
     } catch (err) {
-      console.error('Registration error:', err);
-      setError('Registration failed. Please try again.');
+      console.error('Registration error:', err.response || err);
+      setError(
+        err.response?.data?.error || 'Registration failed. Please try again.'
+      );
     } finally {
       setLoading(false);
     }
@@ -40,8 +55,9 @@ function Register() {
         <h1
           className="text-5xl font-extrabold mb-8 cursor-default select-none"
           style={{
-            animation: "glow 2.5s ease-in-out infinite",
-            textShadow: "0 0 10px #a855f7, 0 0 25px #d946ef, 0 0 40px #ec4899",
+            animation: 'glow 2.5s ease-in-out infinite',
+            textShadow:
+              '0 0 10px #a855f7, 0 0 25px #d946ef, 0 0 40px #ec4899',
           }}
         >
           Chatme
@@ -71,11 +87,19 @@ function Register() {
           onChange={(e) => setEmail(e.target.value)}
         />
         <input
-          className="w-full px-4 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500"
+          className="w-full px-4 py-2 mb-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-pink-500"
           placeholder="Password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+        />
+
+        {/* Profile image upload */}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setProfileImage(e.target.files[0])}
+          className="w-full mb-6 cursor-pointer"
         />
 
         <button
@@ -95,6 +119,15 @@ function Register() {
           </a>
         </p>
       </div>
+
+      {/* Animation keyframes */}
+      <style>{`
+        @keyframes glow {
+          0% { text-shadow: 0 0 5px #a855f7; }
+          50% { text-shadow: 0 0 20px #d946ef, 0 0 30px #ec4899; }
+          100% { text-shadow: 0 0 5px #a855f7; }
+        }
+      `}</style>
     </div>
   );
 }
