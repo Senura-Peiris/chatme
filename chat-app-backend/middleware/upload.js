@@ -2,23 +2,24 @@
 const multer = require('multer');
 const path = require('path');
 
-// Storage config
+// Set storage engine
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads'); // Make sure this matches your folder
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, '../uploads')); // save in uploads folder
   },
-  filename: (req, file, cb) => {
-    const uniqueName = `profileImage-${Date.now()}${path.extname(file.originalname)}`;
+  filename: function (req, file, cb) {
+    const uniqueName = 'profileImage-' + Date.now() + path.extname(file.originalname);
     cb(null, uniqueName);
   },
 });
 
 // File filter (optional)
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image/')) {
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Only image files are allowed!'), false);
+    cb(new Error('Only JPEG, PNG, or WEBP images are allowed.'));
   }
 };
 

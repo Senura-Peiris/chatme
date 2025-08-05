@@ -8,7 +8,7 @@ const User = require('../models/User');
 
 const router = express.Router();
 
-// JWT secret
+// JWT secret key
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecurechatappkey123!';
 
 // Ensure uploads directory exists
@@ -17,7 +17,7 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// Multer config for profile image upload
+// Multer storage and filter config
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadsDir),
   filename: (req, file, cb) => {
@@ -29,19 +29,18 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
-    // Only accept image types
     const allowedTypes = /jpeg|jpg|png|webp/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
     if (extname && mimetype) {
-      return cb(null, true);
+      cb(null, true);
     } else {
       cb(new Error('Only image files (jpg, jpeg, png, webp) are allowed'));
     }
   }
 });
 
-// POST /api/auth/register
+// Route: POST /api/auth/register
 router.post('/register', upload.single('profileImage'), async (req, res) => {
   try {
     const { email, username, password } = req.body;
@@ -83,20 +82,18 @@ router.post('/register', upload.single('profileImage'), async (req, res) => {
         profileImage: newUser.profileImage
       }
     });
+
   } catch (err) {
     console.error('Registration error:', err);
-    res.status(500).json({
-      error: 'Server error during registration',
-      details: err.message
-    });
+    res.status(500).json({ error: 'Server error during registration', details: err.message });
   }
 });
 
-// POST /api/auth/login
+// Route: POST /api/auth/login
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-
   try {
+    const { email, password } = req.body;
+
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ error: 'User not found' });
 
@@ -122,11 +119,11 @@ router.post('/login', async (req, res) => {
 
   } catch (err) {
     console.error('Login error:', err);
-    res.status(500).json({ error: 'Server error during login' });
+    res.status(500).json({ error: 'Server error during login', details: err.message });
   }
 });
 
-// Middleware: verify JWT token
+// JWT Auth Middleware
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ error: "No token provided" });
@@ -139,7 +136,7 @@ const authMiddleware = (req, res, next) => {
   });
 };
 
-// GET /api/auth/me
+// Route: GET /api/auth/me
 router.get('/me', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user.userId).select('-password');
@@ -147,7 +144,7 @@ router.get('/me', authMiddleware, async (req, res) => {
     res.json({ user });
   } catch (err) {
     console.error("Fetch user error:", err);
-    res.status(500).json({ error: "Failed to fetch user" });
+    res.status(500).json({ error: "Failed to fetch user", details: err.message });
   }
 });
 
