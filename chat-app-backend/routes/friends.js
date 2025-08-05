@@ -48,8 +48,8 @@ router.post('/invite-email', authenticateToken, async (req, res) => {
       token,
     });
 
-    const acceptUrl = `http://localhost:5000/api/friends/respond/${token}/accept`;
-    const declineUrl = `http://localhost:5000/api/friends/respond/${token}/decline`;
+    const acceptUrl = `http://localhost:5001/api/friends/respond/${token}/accept`;
+    const declineUrl = `http://localhost:5001/api/friends/respond/${token}/decline`;
 
     const mailOptions = {
       from: `"Chatme" <${process.env.SMTP_USER}>`,
@@ -57,13 +57,13 @@ router.post('/invite-email', authenticateToken, async (req, res) => {
       subject: `${senderName} invited you to Chatme!`,
       html: `
         <p>${senderName} (${senderEmail}) invited you to join <strong>Chatme</strong>!</p>
-        <p>Click below to respond:</p>
+        <p>Click below to respond to the Invitation:</p>
         <p>
           <a href="${acceptUrl}">✅ Accept</a> &nbsp;&nbsp;
           <a href="${declineUrl}">❌ Decline</a>
         </p>
         <br />
-        <p>See you on <a href="https://yourchatmewebsite.com">Chatme</a> 💬</p>
+        <p>See you on <a href="https://chatme-project.netlify.app/">Chatme</a> 💬</p>
       `,
     };
 

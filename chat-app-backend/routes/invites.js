@@ -15,8 +15,8 @@ router.post('/invite-email', authenticateToken, async (req, res) => {
       token,
     });
 
-    const acceptUrl = `http://localhost:5000/api/friends/respond/${token}/accept`;
-    const declineUrl = `http://localhost:5000/api/friends/respond/${token}/decline`;
+    const acceptUrl = `http://localhost:5001/api/friends/respond/${token}/accept`;
+    const declineUrl = `http://localhost:5001/api/friends/respond/${token}/decline`;
 
     const mailOptions = {
       from: `"Chatme" <${process.env.SMTP_USER}>`,
