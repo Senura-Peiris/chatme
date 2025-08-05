@@ -7,7 +7,7 @@ export default defineConfig({
            tailwindcss()],
   server: {
     proxy: {
-      '/api': 'http://localhost:5001',
+      '/api': 'https://chatme-production-6ae4.up.railway.app',
     },
   },
 });

@@ -7,7 +7,8 @@ import Register from './pages/Register';
 import './App.css';
 import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:5001'); // Backend server
+// With
+const socket = io('https://chatme-production-6ae4.up.railway.app');
 
 function App() {
   const [user, setUser] = useState(null);
