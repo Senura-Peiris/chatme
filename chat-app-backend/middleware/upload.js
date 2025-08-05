@@ -1,17 +1,27 @@
+// middlewares/upload.js
 const multer = require('multer');
 const path = require('path');
 
-// Storage configuration
+// Storage config
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/'); // uploads folder in backend
+  destination: (req, file, cb) => {
+    cb(null, 'uploads'); // Make sure this matches your folder
   },
-  filename: function (req, file, cb) {
-    const uniqueName = 'profileImage-' + Date.now() + path.extname(file.originalname);
+  filename: (req, file, cb) => {
+    const uniqueName = `profileImage-${Date.now()}${path.extname(file.originalname)}`;
     cb(null, uniqueName);
   },
 });
 
-const upload = multer({ storage });
+// File filter (optional)
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only image files are allowed!'), false);
+  }
+};
+
+const upload = multer({ storage, fileFilter });
 
 module.exports = upload;

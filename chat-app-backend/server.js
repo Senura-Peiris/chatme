@@ -35,7 +35,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ Serve profile images or any uploaded files
+// Serve profile images or any uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Test base route
@@ -75,7 +75,7 @@ io.on('connection', (socket) => {
     console.log(`✅ Registered user: ${userId} with socket: ${socket.id}`);
   });
 
-  // Add more socket events here...
+  // Add more socket events here
 
   socket.on('disconnect', () => {
     for (const [userId, sockId] of connectedUsers.entries()) {
@@ -92,9 +92,7 @@ io.on('connection', (socket) => {
 console.log('Mongo URI:', process.env.ATLAS_URI);
 
 mongoose
-  .connect(process.env.ATLAS_URI, {
-    dbName: 'Chatme',
-  })
+  .connect(process.env.ATLAS_URI)
   .then(async () => {
     console.log('✅ Connected to MongoDB Atlas');
 
