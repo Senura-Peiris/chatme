@@ -16,7 +16,7 @@ const server = http.createServer(app);
 const allowedOrigins = [
   'http://localhost:5173',
   'https://chatme-production-6ae4.up.railway.app',
-  'https://chatme-project.netlify.app', //Netlify Host URL
+  'https://chatme-system.netlify.app/', //Netlify Host URL
 ];
 
 // CORS setup
