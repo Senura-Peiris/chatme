@@ -63,7 +63,7 @@ router.post('/invite-email', authenticateToken, async (req, res) => {
           <a href="${declineUrl}">❌ Decline</a>
         </p>
         <br />
-        <p>See you on <a href="https://chatme-system.netlify.app/">Chatme</a> 💬</p>
+        <p>See you on <a href="https://chatmeapplication.netlify.app/">Chatme</a> 💬</p>
       `,
     };
 
