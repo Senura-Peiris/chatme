@@ -1,28 +1,17 @@
-// middlewares/upload.js
 const multer = require('multer');
 const path = require('path');
 
-// Set storage engine
+// Storage settings
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, '../uploads')); // save in uploads folder
+    cb(null, 'uploads/'); // This saves in chat-app-backend/uploads
   },
   filename: function (req, file, cb) {
-    const uniqueName = 'profileImage-' + Date.now() + path.extname(file.originalname);
+    const uniqueName = `${Date.now()}-${file.originalname}`;
     cb(null, uniqueName);
-  },
+  }
 });
 
-// File filter (optional)
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-  if (allowedTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error('Only JPEG, PNG, or WEBP images are allowed.'));
-  }
-};
-
-const upload = multer({ storage, fileFilter });
+const upload = multer({ storage: storage });
 
 module.exports = upload;
