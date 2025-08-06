@@ -51,9 +51,15 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white mb-10">
       {/* Header */}
-      <header className="flex flex-col md:flex-row justify-between items-center px-6 py-4 gap-4 md:gap-0 shadow-lg">
+      <header
+  className="fixed  top-0 left-0 w-full z-50 flex flex-col md:flex-row justify-between items-center px-6 py-4 gap-4 md:gap-0 shadow-lg bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white"
+  style={{
+    backdropFilter: 'blur(8px)',
+    backgroundAttachment: 'fixed',
+  }}
+>
   <h1
     className="text-4xl md:text-5xl font-bold tracking-wide"
     style={{
