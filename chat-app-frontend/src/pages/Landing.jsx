@@ -54,28 +54,31 @@ const LandingPage = () => {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white">
       {/* Header */}
       <header className="flex flex-col md:flex-row justify-between items-center px-6 py-4 gap-4 md:gap-0 shadow-lg">
-    <h1
-      className="text-4xl md:text-5xl font-bold tracking-wide"
-      style={{
-        animation: "glow 2s ease-in-out infinite",
-        textShadow: "0 0 10px #3b82f6, 0 0 20px #3b82f6, 0 0 30px #3b82f6",
-      }}
-    >
-      Chatme
-    </h1>
-    <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
-      <Link to="/login">
-        <button className="border border-white text-white px-4 py-2 rounded hover:bg-white hover:text-black transition w-full sm:w-auto">
-          Login
-        </button>
-      </Link>
-      <Link to="/register">
-        <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition w-full sm:w-auto">
-          Register
-        </button>
-      </Link>
-    </div>
-  </header>
+  <h1
+    className="text-4xl md:text-5xl font-bold tracking-wide"
+    style={{
+      animation: "glow 2s ease-in-out infinite",
+      textShadow: "0 0 10px #3b82f6, 0 0 20px #3b82f6, 0 0 30px #3b82f6",
+    }}
+  >
+    Chatme
+  </h1>
+
+  {/* Buttons - only visible on md and larger screens */}
+  <div className="hidden md:flex flex-col md:flex-row gap-2 md:gap-4">
+    <Link to="/login">
+      <button className="border border-white text-white px-4 py-2 rounded hover:bg-white hover:text-black transition">
+        Login
+      </button>
+    </Link>
+    <Link to="/register">
+      <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+        Register
+      </button>
+    </Link>
+  </div>
+</header>
+
 
       {/* Main Content */}
       <main className="flex-grow">
