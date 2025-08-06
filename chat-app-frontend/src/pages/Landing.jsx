@@ -51,7 +51,7 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white mb-10">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white">
       {/* Header */}
       <header
   className="fixed  top-0 left-0 w-full z-50 flex flex-col md:flex-row justify-between items-center px-6 py-4 gap-4 md:gap-0 shadow-lg bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white"
@@ -137,7 +137,7 @@ const LandingPage = () => {
             loop
             muted
             playsInline
-            className="md:w-1/2 w-full rounded-xl shadow-xl"
+            className="md:w-1/2 w-full rounded-xl shadow-xl mt-10"
           />
         </section>
 
