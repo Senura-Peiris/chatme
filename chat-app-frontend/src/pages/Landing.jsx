@@ -4,7 +4,7 @@ import heroVideo from "../videos/Intro video.mp4";
 import featureVideo from "../videos/features video.mp4"; // Rename your actual file to match
 
 const LandingPage = () => {
-  const texts = ["Welcome To Chatme", "Chat with your friends"];
+  const texts = ["Welcome To Chatme", "Chat with your friends", "Anytime and Anywhere"];
   const typingSpeed = 100;
   const deletingSpeed = 50;
   const pauseTime = 1500;
