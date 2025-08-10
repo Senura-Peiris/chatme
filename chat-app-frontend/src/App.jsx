@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route} from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Landingpage from './pages/Landing';
 import Chat from './pages/Chat';
@@ -7,8 +7,11 @@ import Register from './pages/Register';
 import './App.css';
 import { io } from 'socket.io-client';
 
-// Create socket outside component to avoid re-creating it
-const socket = io('https://chatme-production-6ae4.up.railway.app');
+// Use environment variable or fallback to production URL
+const API_URL = import.meta.env.VITE_API_URL || 'https://chatme-production-6ae4.up.railway.app';
+
+// Create socket connection
+const socket = io(API_URL);
 
 function App() {
   const [user, setUser] = useState(() => {
@@ -16,9 +19,9 @@ function App() {
     return stored ? JSON.parse(stored) : null;
   });
 
-  // Register user with socket
+  // Register user once when socket & user are ready
   useEffect(() => {
-    if (user && socket) {
+    if (user?._id) {
       socket.emit('register', user._id);
     }
   }, [user]);
@@ -29,7 +32,7 @@ function App() {
         <Route path="/" element={<Landingpage />} />
         <Route path="/login" element={<Login setUser={setUser} />} />
         <Route path="/register" element={<Register setUser={setUser} />} />
-        <Route path="/chat" element={<Chat socket={socket} user={user} />} />
+        <Route path="/chat" element={<Chat socket={socket} />} />
       </Routes>
     </Router>
   );
