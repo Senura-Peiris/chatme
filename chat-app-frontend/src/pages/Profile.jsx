@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { PencilSquareIcon } from "@heroicons/react/24/solid"; // npm install @heroicons/react
 
 function Profile() {
   const [user, setUser] = useState(null);
@@ -9,8 +10,8 @@ function Profile() {
     username: "",
     email: "",
     profileImage: "",
-    password: "",           // <-- add password here
-    confirmPassword: "",    // for confirming password
+    password: "",
+    confirmPassword: "",
   });
   const [fullscreenImage, setFullscreenImage] = useState(false);
   const navigate = useNavigate();
@@ -85,7 +86,6 @@ function Profile() {
       alert("Profile updated successfully");
       setEditMode(false);
 
-      // Refresh user info
       const res = await axios.get("http://localhost:5001/api/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -117,7 +117,6 @@ function Profile() {
 
   return (
     <>
-      {/* Fullscreen Image View */}
       {fullscreenImage && (
         <div
           className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50"
@@ -133,7 +132,7 @@ function Profile() {
           <img
             src={getImageSrc()}
             alt="Profile Fullscreen"
-            className="max-w-full max-h-full object-contain"
+            className="max-w-full max-h-full object-contain rounded-lg"
           />
           <button
             onClick={() => setFullscreenImage(false)}
@@ -146,114 +145,137 @@ function Profile() {
         </div>
       )}
 
-      {/* Profile Content */}
       {!fullscreenImage && (
-        <div className="max-w-xl mx-auto mt-8 p-6 bg-gray-800 rounded text-white">
-          <h1 className="text-3xl mb-6">Your Profile</h1>
-
-          {!editMode ? (
-            <div>
-              <img
-                src={getImageSrc()}
-                alt="Profile"
-                className="w-32 h-32 rounded-full object-cover mb-4 cursor-zoom-in"
-                onClick={() => setFullscreenImage(true)}
-                title="Click to view full screen"
-              />
-              <p>
-                <strong>Username:</strong> {user.username}
-              </p>
-              <p>
-                <strong>Email:</strong> {user.email}
-              </p>
+        <div className="max-w-md mx-auto mt-8 bg-white rounded-lg shadow-md p-6">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-2xl font-semibold text-gray-800">Profile</h1>
+            {!editMode && (
               <button
                 onClick={() => setEditMode(true)}
-                className="mt-4 bg-blue-600 px-4 py-2 rounded hover:bg-blue-700"
+                className="text-blue-600 hover:text-blue-800 font-semibold"
+                aria-label="Edit profile"
               >
-                Edit Profile
+                Edit
               </button>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block mb-1">Username</label>
-                <input
-                  type="text"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  className="w-full p-2 rounded text-black"
-                  required
-                />
-              </div>
+            )}
+          </div>
 
-              <div>
-                <label className="block mb-1">Email</label>
+          {/* Profile Image with edit overlay */}
+          <div className="flex justify-center mb-8 relative">
+            <img
+              src={getImageSrc()}
+              alt="Profile"
+              className="w-32 h-32 rounded-full object-cover cursor-pointer border border-gray-300"
+              onClick={() => setFullscreenImage(true)}
+              title="Click to view full screen"
+            />
+            {editMode && (
+              <label
+                htmlFor="profileImage"
+                className="absolute bottom-0 right-0 bg-white rounded-full p-1 cursor-pointer border border-gray-300 hover:bg-gray-100"
+                title="Change profile picture"
+              >
+                <PencilSquareIcon className="w-6 h-6 text-gray-700" />
                 <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full p-2 rounded text-black"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block mb-1">Password (leave blank to keep unchanged)</label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="w-full p-2 rounded text-black"
-                  placeholder="New password"
-                />
-              </div>
-
-              <div>
-                <label className="block mb-1">Confirm Password</label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="w-full p-2 rounded text-black"
-                  placeholder="Confirm new password"
-                />
-              </div>
-
-              <div>
-                <label className="block mb-1">Profile Image</label>
-                <input
+                  id="profileImage"
                   type="file"
                   name="profileImage"
                   accept="image/*"
                   onChange={handleChange}
-                  className="text-white"
+                  className="hidden"
                 />
-                {formData.profileImage && formData.profileImage instanceof File && (
-                  <img
-                    src={URL.createObjectURL(formData.profileImage)}
-                    alt="Preview"
-                    className="w-24 h-24 mt-2 rounded-full object-cover"
-                  />
-                )}
+              </label>
+            )}
+          </div>
+
+          {/* Form */}
+          {!editMode ? (
+            <div className="space-y-4 text-gray-700">
+              <div>
+                <label className="block font-semibold mb-1 text-gray-500">Name</label>
+                <p>{user.username}</p>
+              </div>
+              <div>
+                <label className="block font-semibold mb-1 text-gray-500">Email</label>
+                <p>{user.email}</p>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label htmlFor="username" className="block text-gray-600 font-semibold mb-1">
+                  Name
+                </label>
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                  className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
               </div>
 
-              <div className="flex space-x-4">
-                <button
-                  type="submit"
-                  className="bg-green-600 px-4 py-2 rounded hover:bg-green-700"
-                >
-                  Save
-                </button>
+              <div>
+                <label htmlFor="email" className="block text-gray-600 font-semibold mb-1">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="password" className="block text-gray-600 font-semibold mb-1">
+                  New Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Leave blank to keep unchanged"
+                  className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="confirmPassword" className="block text-gray-600 font-semibold mb-1">
+                  Confirm Password
+                </label>
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="Confirm new password"
+                  className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="flex justify-between space-x-4">
                 <button
                   type="button"
                   onClick={() => setEditMode(false)}
-                  className="bg-gray-600 px-4 py-2 rounded hover:bg-gray-700"
+                  className="flex-1 bg-gray-200 text-gray-700 rounded-md py-2 font-semibold hover:bg-gray-300 transition"
                 >
                   Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 bg-blue-600 text-white rounded-md py-2 font-semibold hover:bg-blue-700 transition"
+                >
+                  Save
                 </button>
               </div>
             </form>
