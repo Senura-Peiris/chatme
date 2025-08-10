@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Bell } from "lucide-react";
+import { Bell, Home } from "lucide-react";
 
 function Chat({ socket }) {
   const navigate = useNavigate();
@@ -17,6 +17,9 @@ function Chat({ socket }) {
   const [incomingInvite, setIncomingInvite] = useState(null);
   const [notifPanelOpen, setNotifPanelOpen] = useState(false);
   const notifPanelRef = useRef(null);
+
+  // New state for sidebar open/close on small screens
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -84,7 +87,6 @@ function Chat({ socket }) {
     }
   };
 
-  // Send invitation email to friend
   const inviteFriend = async () => {
     if (!friendEmail || !user) return;
     const token = localStorage.getItem("token");
@@ -107,7 +109,6 @@ function Chat({ socket }) {
     }
   };
 
-  // Search registered users live
   const handleSearch = async (query) => {
     setSearchQuery(query);
     if (!query.trim()) {
@@ -120,7 +121,6 @@ function Chat({ socket }) {
       const res = await axios.get(`http://localhost:5001/api/users/search?query=${encodeURIComponent(query)}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      // Exclude yourself from results
       const filtered = res.data.users.filter((u) => u._id !== user._id);
       setSearchResults(filtered);
     } catch (err) {
@@ -129,7 +129,6 @@ function Chat({ socket }) {
     }
   };
 
-  // Start chat invite with user from search result
   const startChatWithUser = async (friendId) => {
     try {
       const token = localStorage.getItem("token");
@@ -228,8 +227,28 @@ function Chat({ socket }) {
 
   return (
     <div className="flex h-screen bg-gray-900 text-white">
+      {/* Home icon button on small screens */}
+      <button
+        className="fixed bottom-4 left-4 z-50 p-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white md:hidden"
+        onClick={() => setSidebarOpen((open) => !open)}
+        aria-label="Toggle Sidebar"
+        title="Toggle Sidebar"
+      >
+        <Home className="w-6 h-6" />
+      </button>
+
       {/* Sidebar */}
-      <aside className="w-72 bg-gray-800 flex flex-col">
+      {/* Large screens: static sidebar */}
+      {/* Small screens: off-canvas sliding sidebar */}
+      <aside
+        className={`
+          fixed top-0 left-0 h-full bg-gray-800 flex flex-col w-72
+          transform transition-transform duration-300 ease-in-out
+          z-40
+          md:relative md:translate-x-0
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        `}
+      >
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700">
           <h2
             className="text-4xl font-bold text-white relative z-10 cursor-pointer"
