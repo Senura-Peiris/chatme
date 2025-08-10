@@ -40,6 +40,12 @@ const upload = multer({
   }
 });
 
+// Helper to get full image URL
+const getImageUrl = (req, filename) => {
+  if (!filename) return null;
+  return `${req.protocol}://${req.get('host')}/uploads/${filename}`;
+};
+
 // Route: POST /api/auth/register
 router.post('/register', upload.single('profileImage'), async (req, res) => {
   try {
@@ -79,7 +85,7 @@ router.post('/register', upload.single('profileImage'), async (req, res) => {
         id: newUser._id,
         email: newUser.email,
         username: newUser.username,
-        profileImage: newUser.profileImage
+        profileImage: getImageUrl(req, newUser.profileImage)
       }
     });
 
@@ -113,7 +119,7 @@ router.post('/login', async (req, res) => {
         id: user._id,
         email: user.email,
         username: user.username,
-        profileImage: user.profileImage
+        profileImage: getImageUrl(req, user.profileImage)
       }
     });
 
@@ -141,7 +147,12 @@ router.get('/me', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user.userId).select('-password');
     if (!user) return res.status(404).json({ error: "User not found" });
-    res.json({ user });
+    res.json({
+      user: {
+        ...user.toObject(),
+        profileImage: getImageUrl(req, user.profileImage)
+      }
+    });
   } catch (err) {
     console.error("Fetch user error:", err);
     res.status(500).json({ error: "Failed to fetch user", details: err.message });

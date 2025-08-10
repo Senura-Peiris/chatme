@@ -6,15 +6,13 @@ const path = require('path');
 const http = require('http');
 const { Server } = require('socket.io');
 
-// Load env variables
 dotenv.config({ path: path.resolve(__dirname, './.env') });
 
 const app = express();
 const server = http.createServer(app);
 
-// Allow frontend origins
 const allowedOrigins = [
-  'http://localhost:5173',
+  process.env.FRONTEND_URL || 'http://localhost:5173',
   'https://chatmeapplication.netlify.app',
   'https://chatme-production-6ae4.up.railway.app',
 ];
@@ -35,14 +33,14 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve uploaded files
+// Serve uploaded files (profile images)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Routes
 app.get('/', (req, res) => {
   res.send('🚀 Chatme backend is running!');
 });
 
+// Routes
 const authRoutes = require('./routes/auth');
 const usersRoutes = require('./routes/users');
 const friendsRoutes = require('./routes/friends');
@@ -101,4 +99,5 @@ mongoose
 const PORT = process.env.PORT || 5001;
 server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🌐 Frontend allowed: ${allowedOrigins.join(', ')}`);
 });

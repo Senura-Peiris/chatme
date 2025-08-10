@@ -240,7 +240,7 @@ function Chat({ socket }) {
           {user && (
             <div className="relative flex items-center space-x-3" ref={dropdownRef}>
               <img
-                src={`http://localhost:5001/uploads/${user.profileImage}`}
+                src={user.profileImageUrl || `https://chatme-production-6ae4.up.railway.app${user.profileImage}`}
                 alt="profile"
                 className="w-10 h-10 rounded-full cursor-pointer object-cover border-2 border-blue-500"
                 onClick={toggleDropdown}
