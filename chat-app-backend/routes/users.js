@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const path = require('path');
 const User = require('../models/User');
+const authMiddleware = require('../middleware/auth');
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -87,6 +88,32 @@ router.post('/login', async (req, res) => {
   } catch (error) {
     console.error('Login Error:', error);
     res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ** New Search users route **
+// GET /api/users/search?query=someName
+router.get('/search', authMiddleware, async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    if (!query || query.trim() === '') {
+      return res.json({ users: [] });
+    }
+
+    const regex = new RegExp(query, 'i'); // case-insensitive
+
+    // Search by username or email containing the query string
+    const users = await User.find({
+      $or: [{ username: regex }, { email: regex }],
+    })
+      .select('_id username email profileImage')
+      .limit(10);
+
+    res.json({ users });
+  } catch (error) {
+    console.error('User search error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

@@ -84,13 +84,13 @@ function Chat({ socket }) {
     }
   };
 
-  // Updated inviteFriend to send invitation email through backend API
+  // Send invitation email to friend
   const inviteFriend = async () => {
     if (!friendEmail || !user) return;
     const token = localStorage.getItem("token");
     try {
       await axios.post(
-        "http://localhost:5001/api/friends/invite-email", // Backend email invite endpoint
+        "http://localhost:5001/api/friends/invite-email",
         {
           toEmail: friendEmail,
           senderName: user.username,
@@ -100,13 +100,14 @@ function Chat({ socket }) {
       );
       alert(`Invitation email sent to ${friendEmail}`);
       setFriendEmail("");
-      fetchFriends(user._id, token); // refresh friend list if needed
+      fetchFriends(user._id, token);
     } catch (err) {
       alert("Failed to send invitation email");
       console.error(err);
     }
   };
 
+  // Search registered users live
   const handleSearch = async (query) => {
     setSearchQuery(query);
     if (!query.trim()) {
@@ -116,16 +117,19 @@ function Chat({ socket }) {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`http://localhost:5001/api/users/search?query=${query}`, {
+      const res = await axios.get(`http://localhost:5001/api/users/search?query=${encodeURIComponent(query)}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      // Exclude yourself from results
       const filtered = res.data.users.filter((u) => u._id !== user._id);
       setSearchResults(filtered);
     } catch (err) {
       console.error("User search error:", err);
+      setSearchResults([]);
     }
   };
 
+  // Start chat invite with user from search result
   const startChatWithUser = async (friendId) => {
     try {
       const token = localStorage.getItem("token");
@@ -240,7 +244,7 @@ function Chat({ socket }) {
           {user && (
             <div className="relative flex items-center space-x-3" ref={dropdownRef}>
               <img
-                src={user.profileImageUrl || `https://chatme-production-6ae4.up.railway.app${user.profileImage}`}
+                src={user.profileImageUrl || `http://localhost:5001/uploads/${user.profileImage}`}
                 alt="profile"
                 className="w-10 h-10 rounded-full cursor-pointer object-cover border-2 border-blue-500"
                 onClick={toggleDropdown}
@@ -257,26 +261,25 @@ function Chat({ socket }) {
                 )}
               </button>
               {dropdownOpen && (
-  <div className="absolute right-0 mt-12 w-40 bg-white text-black rounded shadow-lg p-2 z-10">
-    <p className="text-sm font-semibold mb-2">{user.username}</p>
-    <button
-      onClick={() => {
-        setDropdownOpen(false);
-        navigate("/profile");
-      }}
-      className="w-full text-left text-blue-600 hover:bg-blue-100 rounded px-2 py-1 mb-2"
-    >
-      See Profile
-    </button>
-    <button
-      onClick={handleLogout}
-      className="w-full text-left text-red-600 hover:bg-red-100 rounded px-2 py-1"
-    >
-      Logout
-    </button>
-  </div>
-)}
-
+                <div className="absolute right-0 mt-12 w-40 bg-white text-black rounded shadow-lg p-2 z-10">
+                  <p className="text-sm font-semibold mb-2">{user.username}</p>
+                  <button
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      navigate("/profile");
+                    }}
+                    className="w-full text-left text-blue-600 hover:bg-blue-100 rounded px-2 py-1 mb-2"
+                  >
+                    See Profile
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left text-red-600 hover:bg-red-100 rounded px-2 py-1"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -440,7 +443,7 @@ function Chat({ socket }) {
           {incomingInvite ? (
             <div className="bg-gray-700 rounded p-3 space-y-2">
               <p>
-                <strong>{incomingInvite.username}</strong> invited you to chat.
+                <strong>{incomingInvite.username}</strong> Invited you to chat with Your Friend - "Chatme App".
               </p>
               <div className="flex space-x-3">
                 <button
