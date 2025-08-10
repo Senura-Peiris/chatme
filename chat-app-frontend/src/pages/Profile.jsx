@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { PencilSquareIcon } from "@heroicons/react/24/solid"; // npm install @heroicons/react
+import { PencilSquareIcon, ArrowLeftIcon } from "@heroicons/react/24/solid"; // added ArrowLeftIcon
 
 function Profile() {
   const [user, setUser] = useState(null);
@@ -147,13 +147,20 @@ function Profile() {
 
       {!fullscreenImage && (
         <div className="max-w-md mx-auto mt-8 bg-white rounded-lg shadow-md p-6">
-          {/* Header */}
-          <div className="flex justify-between items-center mb-8">
+          {/* Back button and Header */}
+          <div className="flex items-center mb-6">
+            <button
+              onClick={() => navigate("/chat")}
+              aria-label="Back to chat"
+              className="mr-3 p-1 rounded hover:bg-gray-200 transition"
+            >
+              <ArrowLeftIcon className="w-6 h-6 text-gray-700" />
+            </button>
             <h1 className="text-2xl font-semibold text-gray-800">Profile</h1>
             {!editMode && (
               <button
                 onClick={() => setEditMode(true)}
-                className="text-blue-600 hover:text-blue-800 font-semibold"
+                className="ml-auto text-blue-600 hover:text-blue-800 font-semibold"
                 aria-label="Edit profile"
               >
                 Edit
