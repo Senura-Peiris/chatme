@@ -9,6 +9,8 @@ function Profile() {
     username: "",
     email: "",
     profileImage: "",
+    password: "",           // <-- add password here
+    confirmPassword: "",    // for confirming password
   });
   const [fullscreenImage, setFullscreenImage] = useState(false);
   const navigate = useNavigate();
@@ -29,6 +31,8 @@ function Profile() {
           username: res.data.user.username,
           email: res.data.user.email,
           profileImage: res.data.user.profileImage || "",
+          password: "",
+          confirmPassword: "",
         });
       })
       .catch(() => {
@@ -53,6 +57,12 @@ function Profile() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (formData.password && formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
     const token = localStorage.getItem("token");
     try {
       const data = new FormData();
@@ -60,6 +70,9 @@ function Profile() {
       data.append("email", formData.email);
       if (formData.profileImage instanceof File) {
         data.append("profileImage", formData.profileImage);
+      }
+      if (formData.password) {
+        data.append("password", formData.password);
       }
 
       await axios.put("http://localhost:5001/api/users/me", data, {
@@ -81,6 +94,8 @@ function Profile() {
         username: res.data.user.username,
         email: res.data.user.email,
         profileImage: res.data.user.profileImage || "",
+        password: "",
+        confirmPassword: "",
       });
     } catch (err) {
       alert("Failed to update profile");
@@ -90,7 +105,6 @@ function Profile() {
 
   if (!user) return <p>Loading...</p>;
 
-  // Image URL helper to handle new upload or existing
   const getImageSrc = () => {
     if (formData.profileImage instanceof File) {
       return URL.createObjectURL(formData.profileImage);
@@ -182,6 +196,30 @@ function Profile() {
                   onChange={handleChange}
                   className="w-full p-2 rounded text-black"
                   required
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1">Password (leave blank to keep unchanged)</label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full p-2 rounded text-black"
+                  placeholder="New password"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1">Confirm Password</label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="w-full p-2 rounded text-black"
+                  placeholder="Confirm new password"
                 />
               </div>
 
