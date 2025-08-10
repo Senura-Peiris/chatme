@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Landingpage from './pages/Landing';
 import Chat from './pages/Chat';
 import Register from './pages/Register';
+import Profile from "./pages/Profile";
 import './App.css';
 import { io } from 'socket.io-client';
 
@@ -33,6 +34,7 @@ function App() {
         <Route path="/login" element={<Login setUser={setUser} />} />
         <Route path="/register" element={<Register setUser={setUser} />} />
         <Route path="/chat" element={<Chat socket={socket} />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </Router>
   );

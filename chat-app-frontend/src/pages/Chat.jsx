@@ -257,16 +257,26 @@ function Chat({ socket }) {
                 )}
               </button>
               {dropdownOpen && (
-                <div className="absolute right-0 mt-12 w-40 bg-white text-black rounded shadow-lg p-2 z-10">
-                  <p className="text-sm font-semibold mb-2">{user.username}</p>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left text-red-600 hover:bg-red-100 rounded px-2 py-1"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
+  <div className="absolute right-0 mt-12 w-40 bg-white text-black rounded shadow-lg p-2 z-10">
+    <p className="text-sm font-semibold mb-2">{user.username}</p>
+    <button
+      onClick={() => {
+        setDropdownOpen(false);
+        navigate("/profile");
+      }}
+      className="w-full text-left text-blue-600 hover:bg-blue-100 rounded px-2 py-1 mb-2"
+    >
+      See Profile
+    </button>
+    <button
+      onClick={handleLogout}
+      className="w-full text-left text-red-600 hover:bg-red-100 rounded px-2 py-1"
+    >
+      Logout
+    </button>
+  </div>
+)}
+
             </div>
           )}
         </div>
