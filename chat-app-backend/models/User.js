@@ -1,10 +1,11 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
-  username: { type: String, required: true },
-  password: { type: String, required: true },
-  profileImage: { type: String, default: null },  // filename of image
+  username: String,
+  email: String,
+  password: String,
+  profileImageUrl: String, // store Cloudinary URL here
+  // other fields...
 });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model("User", userSchema);

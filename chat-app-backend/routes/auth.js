@@ -2,55 +2,24 @@ const express = require('express');
 const multer = require('multer');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const path = require('path');
-const fs = require('fs');
 const User = require('../models/User');
+const { cloudinary, parser } = require('../config/cloudinaryConfig'); // import your cloudinary config
 
 const router = express.Router();
 
-// JWT secret key
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecurechatappkey123!';
 
-// Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, '..', 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-// Multer storage and filter config
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadsDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const uniqueName = `profileImage-${Date.now()}${ext}`;
-    cb(null, uniqueName);
-  }
-});
-const upload = multer({
-  storage,
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|webp/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
-    if (extname && mimetype) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only image files (jpg, jpeg, png, webp) are allowed'));
-    }
-  }
-});
-
-// Helper to get full image URL
-const getImageUrl = (req, filename) => {
-  if (!filename) return null;
-  return `${req.protocol}://${req.get('host')}/uploads/${filename}`;
+// Helper to get profile image URL (Cloudinary URL stored directly)
+const getImageUrl = (user) => {
+  // user.profileImageUrl stores the Cloudinary URL string
+  return user.profileImageUrl || null;
 };
 
-// Route: POST /api/auth/register
-router.post('/register', upload.single('profileImage'), async (req, res) => {
+// Registration route
+router.post('/register', parser.single('profileImage'), async (req, res) => {
   try {
     const { email, username, password } = req.body;
-    const profileImage = req.file ? req.file.filename : null;
+    const profileImageUrl = req.file ? req.file.path : null;
 
     if (!email || !username || !password) {
       return res.status(400).json({ error: 'All fields are required' });
@@ -67,7 +36,7 @@ router.post('/register', upload.single('profileImage'), async (req, res) => {
       email,
       username,
       password: hashedPassword,
-      profileImage
+      profileImageUrl // store Cloudinary image URL here
     });
 
     await newUser.save();
@@ -85,7 +54,7 @@ router.post('/register', upload.single('profileImage'), async (req, res) => {
         id: newUser._id,
         email: newUser.email,
         username: newUser.username,
-        profileImage: getImageUrl(req, newUser.profileImage)
+        profileImageUrl: getImageUrl(newUser),
       }
     });
 
@@ -95,7 +64,7 @@ router.post('/register', upload.single('profileImage'), async (req, res) => {
   }
 });
 
-// Route: POST /api/auth/login
+// Login route (unchanged except profileImageUrl field)
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -119,7 +88,7 @@ router.post('/login', async (req, res) => {
         id: user._id,
         email: user.email,
         username: user.username,
-        profileImage: getImageUrl(req, user.profileImage)
+        profileImageUrl: getImageUrl(user),
       }
     });
 
@@ -129,7 +98,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// JWT Auth Middleware
+// JWT middleware (unchanged)
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ error: "No token provided" });
@@ -142,7 +111,7 @@ const authMiddleware = (req, res, next) => {
   });
 };
 
-// Route: GET /api/auth/me
+// Get current user profile (unchanged except profileImageUrl)
 router.get('/me', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user.userId).select('-password');
@@ -150,7 +119,7 @@ router.get('/me', authMiddleware, async (req, res) => {
     res.json({
       user: {
         ...user.toObject(),
-        profileImage: getImageUrl(req, user.profileImage)
+        profileImageUrl: getImageUrl(user),
       }
     });
   } catch (err) {
