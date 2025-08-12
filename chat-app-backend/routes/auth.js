@@ -3,7 +3,7 @@ const multer = require('multer');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const { cloudinary, parser } = require('../config/cloudinaryConfig'); // import your cloudinary config
+const { cloudinary, parser } = require('../config/cloudinaryConfig'); // your cloudinary config & multer parser
 
 const router = express.Router();
 
@@ -11,11 +11,10 @@ const JWT_SECRET = process.env.JWT_SECRET || 'supersecurechatappkey123!';
 
 // Helper to get profile image URL (Cloudinary URL stored directly)
 const getImageUrl = (user) => {
-  // user.profileImageUrl stores the Cloudinary URL string
   return user.profileImageUrl || null;
 };
 
-// Registration route
+// Registration route with profile image upload support
 router.post('/register', parser.single('profileImage'), async (req, res) => {
   try {
     const { email, username, password } = req.body;
@@ -25,28 +24,33 @@ router.post('/register', parser.single('profileImage'), async (req, res) => {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
+    // Check if email already registered
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({ error: 'Email already registered' });
     }
 
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Create user with profileImageUrl from Cloudinary upload
     const newUser = new User({
       email,
       username,
       password: hashedPassword,
-      profileImageUrl // store Cloudinary image URL here
+      profileImageUrl,
     });
 
     await newUser.save();
 
+    // Generate JWT token
     const token = jwt.sign(
       { userId: newUser._id, username: newUser.username },
       JWT_SECRET,
       { expiresIn: '1h' }
     );
 
+    // Send response with user info & token
     res.status(201).json({
       message: 'User registered successfully',
       token,
@@ -57,14 +61,13 @@ router.post('/register', parser.single('profileImage'), async (req, res) => {
         profileImageUrl: getImageUrl(newUser),
       }
     });
-
   } catch (err) {
     console.error('Registration error:', err);
     res.status(500).json({ error: 'Server error during registration', details: err.message });
   }
 });
 
-// Login route (unchanged except profileImageUrl field)
+// Login route
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -98,7 +101,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// JWT middleware (unchanged)
+// JWT middleware
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ error: "No token provided" });
@@ -111,7 +114,7 @@ const authMiddleware = (req, res, next) => {
   });
 };
 
-// Get current user profile (unchanged except profileImageUrl)
+// Get current user profile
 router.get('/me', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user.userId).select('-password');

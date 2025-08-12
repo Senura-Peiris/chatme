@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { PencilSquareIcon, ArrowLeftIcon } from "@heroicons/react/24/solid"; // added ArrowLeftIcon
+import { PencilSquareIcon, ArrowLeftIcon } from "@heroicons/react/24/solid";
 
 function Profile() {
   const [user, setUser] = useState(null);
@@ -9,7 +9,7 @@ function Profile() {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
-    profileImage: "",
+    profileImage: "", // can be URL string or File
     password: "",
     confirmPassword: "",
   });
@@ -31,7 +31,7 @@ function Profile() {
         setFormData({
           username: res.data.user.username,
           email: res.data.user.email,
-          profileImage: res.data.user.profileImage || "",
+          profileImage: res.data.user.profileImageUrl || "", // <-- use profileImageUrl here
           password: "",
           confirmPassword: "",
         });
@@ -46,7 +46,7 @@ function Profile() {
     if (name === "profileImage") {
       setFormData((prev) => ({
         ...prev,
-        profileImage: files[0],
+        profileImage: files[0], // File object
       }));
     } else {
       setFormData((prev) => ({
@@ -86,6 +86,7 @@ function Profile() {
       alert("Profile updated successfully");
       setEditMode(false);
 
+      // Refresh user data after update
       const res = await axios.get("http://localhost:5001/api/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -93,7 +94,7 @@ function Profile() {
       setFormData({
         username: res.data.user.username,
         email: res.data.user.email,
-        profileImage: res.data.user.profileImage || "",
+        profileImage: res.data.user.profileImageUrl || "", // keep consistent here too
         password: "",
         confirmPassword: "",
       });
@@ -105,12 +106,13 @@ function Profile() {
 
   if (!user) return <p>Loading...</p>;
 
+  // Return URL string for image preview or actual Cloudinary URL
   const getImageSrc = () => {
     if (formData.profileImage instanceof File) {
       return URL.createObjectURL(formData.profileImage);
     }
-    if (user.profileImage) {
-      return `http://localhost:5001/uploads/${user.profileImage}`;
+    if (typeof formData.profileImage === "string" && formData.profileImage) {
+      return formData.profileImage;
     }
     return "https://via.placeholder.com/150";
   };
@@ -200,18 +202,25 @@ function Profile() {
           {!editMode ? (
             <div className="space-y-4 text-gray-700">
               <div>
-                <label className="block font-semibold mb-1 text-gray-500">Name</label>
+                <label className="block font-semibold mb-1 text-gray-500">
+                  Name
+                </label>
                 <p>{user.username}</p>
               </div>
               <div>
-                <label className="block font-semibold mb-1 text-gray-500">Email</label>
+                <label className="block font-semibold mb-1 text-gray-500">
+                  Email
+                </label>
                 <p>{user.email}</p>
               </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="username" className="block text-gray-600 font-semibold mb-1">
+                <label
+                  htmlFor="username"
+                  className="block text-gray-600 font-semibold mb-1"
+                >
                   Name
                 </label>
                 <input
@@ -226,7 +235,10 @@ function Profile() {
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-gray-600 font-semibold mb-1">
+                <label
+                  htmlFor="email"
+                  className="block text-gray-600 font-semibold mb-1"
+                >
                   Email
                 </label>
                 <input
@@ -241,7 +253,10 @@ function Profile() {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-gray-600 font-semibold mb-1">
+                <label
+                  htmlFor="password"
+                  className="block text-gray-600 font-semibold mb-1"
+                >
                   New Password
                 </label>
                 <input
@@ -256,7 +271,10 @@ function Profile() {
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="block text-gray-600 font-semibold mb-1">
+                <label
+                  htmlFor="confirmPassword"
+                  className="block text-gray-600 font-semibold mb-1"
+                >
                   Confirm Password
                 </label>
                 <input
