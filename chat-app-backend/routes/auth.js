@@ -3,11 +3,14 @@ const multer = require('multer');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const { cloudinary, parser } = require('../config/cloudinary'); // your cloudinary config & multer parser
+const { cloudinary, storage } = require('../config/cloudinary'); // cloudinary config + multer storage
 
 const router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecurechatappkey123!';
+
+// Create multer parser middleware using the imported storage
+const parser = multer({ storage });
 
 // Helper to get profile image URL (Cloudinary URL stored directly)
 const getImageUrl = (user) => {
@@ -18,6 +21,7 @@ const getImageUrl = (user) => {
 router.post('/register', parser.single('profileImage'), async (req, res) => {
   try {
     const { email, username, password } = req.body;
+    // Cloudinary multer puts uploaded file info in req.file.path
     const profileImageUrl = req.file ? req.file.path : null;
 
     if (!email || !username || !password) {
