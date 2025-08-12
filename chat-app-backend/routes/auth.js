@@ -3,7 +3,7 @@ const multer = require('multer');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const { cloudinary, parser } = require('../config/cloudinaryConfig'); // your cloudinary config & multer parser
+const { cloudinary, parser } = require('../config/cloudinary'); // your cloudinary config & multer parser
 
 const router = express.Router();
 
