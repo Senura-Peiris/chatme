@@ -6,16 +6,29 @@ const multer = require('multer');
 const path = require('path');
 const User = require('../models/User');
 const authMiddleware = require('../middleware/auth');
+const dotenv = require('dotenv');
+const { v2: cloudinary } = require('cloudinary');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/');
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
+dotenv.config();
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
+
+// Multer storage with Cloudinary
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'chatme_profiles', // Cloudinary folder
+    allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
+    transformation: [{ width: 500, height: 500, crop: 'limit' }] // optional resize
+  },
+});
+
 const upload = multer({ storage });
 
 // Register route
@@ -31,7 +44,7 @@ router.post('/register', upload.single('profileImage'), async (req, res) => {
     if (existingUser) return res.status(400).json({ error: 'User already exists' });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const profileImage = req.file ? req.file.filename : null;
+    const profileImage = req.file ? req.file.path : null; // Cloudinary URL
 
     const newUser = new User({
       username,
@@ -91,8 +104,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// ** New Search users route **
-// GET /api/users/search?query=someName
+// Search users route
 router.get('/search', authMiddleware, async (req, res) => {
   try {
     const { query } = req.query;
@@ -101,9 +113,8 @@ router.get('/search', authMiddleware, async (req, res) => {
       return res.json({ users: [] });
     }
 
-    const regex = new RegExp(query, 'i'); // case-insensitive
+    const regex = new RegExp(query, 'i');
 
-    // Search by username or email containing the query string
     const users = await User.find({
       $or: [{ username: regex }, { email: regex }],
     })
