@@ -151,18 +151,12 @@ function Profile() {
         <div className="max-w-md mx-auto mt-8 bg-white rounded-lg shadow-md p-6">
           {/* Back button and Header */}
           <div className="flex items-center mb-6">
-            <button
-              onClick={() => navigate("/chat")}
-              aria-label="Back to chat"
-              className="mr-3 p-1 rounded hover:bg-gray-200 transition"
-            >
-              <ArrowLeftIcon className="w-6 h-6 text-gray-700" />
-            </button>
-            <h1 className="text-2xl font-semibold text-gray-800">Profile</h1>
+           
+            <h1 className="text-2xl font-semibold text-gray-800 cursor-pointer">My Profile</h1>
             {!editMode && (
               <button
                 onClick={() => setEditMode(true)}
-                className="ml-auto text-blue-600 hover:text-blue-800 font-semibold"
+                className="ml-auto text-blue-600 hover:text-blue-800 font-semibold cursor-pointer"
                 aria-label="Edit profile"
               >
                 Edit
@@ -230,7 +224,7 @@ function Profile() {
                   value={formData.username}
                   onChange={handleChange}
                   required
-                  className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border text-black border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -248,7 +242,7 @@ function Profile() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border text-black border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -266,7 +260,7 @@ function Profile() {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Leave blank to keep unchanged"
-                  className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border text-black border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -284,7 +278,7 @@ function Profile() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="Confirm new password"
-                  className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border text-black border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 

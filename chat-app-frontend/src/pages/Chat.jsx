@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Bell, Home } from "lucide-react";
+import Profile from "./Profile";
 
 function Chat({ socket }) {
   const navigate = useNavigate();
@@ -18,8 +19,11 @@ function Chat({ socket }) {
   const [notifPanelOpen, setNotifPanelOpen] = useState(false);
   const notifPanelRef = useRef(null);
 
-  // New state for sidebar open/close on small screens
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // New state for profile panel
+  const [profilePanelOpen, setProfilePanelOpen] = useState(false);
+  const profilePanelRef = useRef(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -184,8 +188,8 @@ function Chat({ socket }) {
     setIncomingInvite(null);
   };
 
-  const toggleDropdown = () => setDropdownOpen((prev) => !prev);
 
+  // Click outside for dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -200,6 +204,7 @@ function Chat({ socket }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [dropdownOpen]);
 
+  // Click outside for notifications
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -220,10 +225,25 @@ function Chat({ socket }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [notifPanelOpen]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
-  };
+  // Click outside for profile panel
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        profilePanelRef.current &&
+        !profilePanelRef.current.contains(event.target) &&
+        !event.target.closest("img[alt='profile']")
+      ) {
+        setProfilePanelOpen(false);
+      }
+    };
+    if (profilePanelOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [profilePanelOpen]);
+
 
   return (
     <div className="flex h-screen bg-gray-900 text-white">
@@ -234,12 +254,10 @@ function Chat({ socket }) {
         aria-label="Toggle Sidebar"
         title="Toggle Sidebar"
       >
-        <Home className="w-6 h-6" />
+        <Home className="w-6 h-6 cursor-pointer" />
       </button>
 
       {/* Sidebar */}
-      {/* Large screens: static sidebar */}
-      {/* Small screens: off-canvas sliding sidebar */}
       <aside
         className={`
           fixed top-0 left-0 h-full bg-gray-800 flex flex-col w-72
@@ -266,7 +284,7 @@ function Chat({ socket }) {
                 src={user.profileImageUrl || `http://localhost:5001/uploads/${user.profileImage}`}
                 alt="profile"
                 className="w-10 h-10 rounded-full cursor-pointer object-cover border-2 border-blue-500"
-                onClick={toggleDropdown}
+                onClick={() => setProfilePanelOpen(true)}
               />
               <button
                 className="relative text-white hover:text-blue-400 focus:outline-none"
@@ -274,31 +292,11 @@ function Chat({ socket }) {
                 onClick={() => setNotifPanelOpen((prev) => !prev)}
                 style={{ display: "flex", alignItems: "center" }}
               >
-                <Bell className="w-6 h-6" />
+                <Bell className="w-6 h-6 cursor-pointer" />
                 {incomingInvite && (
                   <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-600"></span>
                 )}
               </button>
-              {dropdownOpen && (
-                <div className="absolute right-0 mt-12 w-40 bg-white text-black rounded shadow-lg p-2 z-10">
-                  <p className="text-sm font-semibold mb-2">{user.username}</p>
-                  <button
-                    onClick={() => {
-                      setDropdownOpen(false);
-                      navigate("/profile");
-                    }}
-                    className="w-full text-left text-blue-600 hover:bg-blue-100 rounded px-2 py-1 mb-2"
-                  >
-                    See Profile
-                  </button>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left text-red-600 hover:bg-red-100 rounded px-2 py-1"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
             </div>
           )}
         </div>
@@ -353,35 +351,34 @@ function Chat({ socket }) {
             </div>
 
             <input
-              type="text"
-              placeholder="Search registered users"
-              value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="p-2 rounded w-full mb-4 text-black bg-white"
-            />
+  type="text"
+  placeholder="Search registered users"
+  value={searchQuery}
+  onChange={(e) => handleSearch(e.target.value)}
+  className="p-2 rounded w-full mb-4 text-black bg-white"
+/>
 
-            {searchResults.length > 0 && (
-              <div className="mb-4">
-                <h2 className="text-xl mb-2">Search Results</h2>
-                <ul className="space-y-2 max-h-64 overflow-auto">
-                  {searchResults.map((result) => (
-                    <li
-                      key={result._id}
-                      className="bg-gray-800 p-2 rounded cursor-pointer hover:bg-gray-700 flex items-center space-x-3"
-                      onClick={() => startChatWithUser(result._id)}
-                    >
-                      <img
-                        src={`http://localhost:5001/uploads/${result.profileImage}`}
-                        alt={`${result.username} profile`}
-                        className="w-8 h-8 rounded-full object-cover"
-                      />
-                      <span>{result.username}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
+{searchResults.length > 0 && (
+  <div className="mb-4">
+    <h2 className="text-xl mb-2">Search Results</h2>
+    <ul className="space-y-2 max-h-64 overflow-auto">
+      {searchResults.map((result) => (
+        <li
+          key={result._id}
+          className="bg-gray-800 p-2 rounded cursor-pointer hover:bg-gray-700 flex items-center space-x-3"
+          onClick={() => startChatWithUser(result._id)}
+        >
+          <img
+            src={result.profileImage || "/default-profile.png"}
+            alt={`${result.username} profile`}
+            className="w-8 h-8 rounded-full object-cover"
+          />
+          <span>{result.username}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
             {friends.length > 0 && (
               <div>
                 <h2 className="text-xl mb-2">Your Friends</h2>
@@ -482,6 +479,36 @@ function Chat({ socket }) {
           ) : (
             <p className="text-gray-400">No new invitations.</p>
           )}
+        </div>
+      </div>
+
+      {/* Profile Panel */}
+      <div
+        ref={profilePanelRef}
+        className={`fixed top-0 right-0 h-full w-full sm:w-96 bg-white shadow-lg z-50 transform transition-transform duration-300 overflow-y-auto ${
+          profilePanelOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="flex justify-between items-center p-4 border-b border-gray-300">
+          <h2 className="text-lg font-semibold text-gray-800">Profile</h2>
+          <button
+            onClick={() => setProfilePanelOpen(false)}
+            className="text-gray-600 hover:text-gray-800"
+          >
+            ✕
+          </button>
+        </div>
+        <div className="p-4">
+          <Profile />
+          <button
+      onClick={() => {
+        localStorage.removeItem("token");
+        navigate("/login");
+      }}
+      className="mt-6 w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2 rounded"
+    >
+      Logout
+    </button>
         </div>
       </div>
 
