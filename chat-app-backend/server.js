@@ -6,6 +6,10 @@ const path = require('path');
 const http = require('http');
 const { Server } = require('socket.io');
 
+const notificationRoutes = require('./routes/notifications');
+app.use('/api/notifications', notificationRoutes);
+
+
 dotenv.config({ path: path.resolve(__dirname, './.env') });
 
 const app = express();

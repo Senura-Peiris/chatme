@@ -132,31 +132,45 @@ function Chat({ socket }) {
       setSearchResults([]);
     }
   };
-
   const startChatWithUser = async (friendId) => {
     try {
       const token = localStorage.getItem("token");
-
+  
       const res = await axios.get(`http://localhost:5001/api/users/${friendId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+  
       const friend = res.data.user;
-
+  
       const confirmSend = window.confirm(`Send chat invitation to ${friend.username}?`);
       if (!confirmSend) return;
-
+  
+      // Store notification in DB
+      await axios.post(
+        "http://localhost:5001/api/notifications",
+        {
+          recipientId: friend._id,
+          senderId: user._id,
+          message: `${user.username} invited you to chat on Chatme.`,
+          type: "chat_invite",
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+  
+      // Emit socket event for real-time
       socket.emit("send_invite", {
         from: { id: user._id, username: user.username },
         to: { id: friend._id, username: friend.username },
       });
-
+  
       alert(`Invite sent to ${friend.username}`);
     } catch (err) {
       console.error("Start chat error:", err?.response?.data || err.message || err);
       alert(err?.response?.data?.message || "Could not send chat invite.");
     }
   };
+  
+  
 
   const acceptInvite = async () => {
     try {

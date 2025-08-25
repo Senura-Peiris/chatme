@@ -1,16 +1,37 @@
 const express = require('express');
 const router = express.Router();
 const Notification = require('../models/Notification');
-const authenticateToken = require('../middleware/authenticateToken'); // see step 4
 
-// Get all notifications for user
-router.get('/', authenticateToken, async (req, res) => {
+// Create notification
+router.post('/', async (req, res) => {
   try {
-    const notifications = await Notification.find({ userId: req.user.id }).sort({ createdAt: -1 }).populate('senderId', 'username');
-    res.json({ notifications });
+    const { recipientId, senderId, message, type } = req.body;
+
+    const notification = new Notification({
+      recipientId,
+      senderId,
+      message,
+      type,
+      read: false,
+      createdAt: new Date(),
+    });
+
+    await notification.save();
+    res.status(201).json({ success: true, notification });
   } catch (err) {
-    console.error('Notification fetch error:', err.message);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error saving notification:", err);
+    res.status(500).json({ success: false, message: "Failed to create notification" });
+  }
+});
+
+// Fetch notifications for a user
+router.get('/:userId', async (req, res) => {
+  try {
+    const notifications = await Notification.find({ recipientId: req.params.userId }).sort({ createdAt: -1 });
+    res.json({ success: true, notifications });
+  } catch (err) {
+    console.error("Error fetching notifications:", err);
+    res.status(500).json({ success: false, message: "Failed to fetch notifications" });
   }
 });
 

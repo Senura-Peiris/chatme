@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 
-const notificationSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Receiver
+const NotificationSchema = new mongoose.Schema({
+  recipientId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   senderId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  type: { type: String, enum: ['invite'], default: 'invite' },
-  message: String,
+  message: { type: String, required: true },
+  type: { type: String, enum: ['chat_invite', 'other'], default: 'chat_invite' },
   read: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Notification', notificationSchema);
+module.exports = mongoose.model('Notification', NotificationSchema);
