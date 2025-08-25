@@ -6,15 +6,12 @@ const path = require('path');
 const http = require('http');
 const { Server } = require('socket.io');
 
-const notificationRoutes = require('./routes/notifications');
-app.use('/api/notifications', notificationRoutes);
-
-
 dotenv.config({ path: path.resolve(__dirname, './.env') });
 
-const app = express();
+const app = express(); // <-- Declare app before using it
 const server = http.createServer(app);
 
+// Allowed origins
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:5173',
   'https://chatmeapplication.netlify.app',
@@ -48,7 +45,7 @@ app.get('/', (req, res) => {
 const authRoutes = require('./routes/auth');
 const usersRoutes = require('./routes/users');
 const friendsRoutes = require('./routes/friends');
-const notificationRoutes = require('./routes/notifications');
+const notificationRoutes = require('./routes/notifications'); // <-- Only once
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
