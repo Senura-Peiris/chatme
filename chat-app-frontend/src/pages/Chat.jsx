@@ -416,6 +416,7 @@ function Chat({ socket }) {
           </div>
         )}
 
+
         {/* Group Calls Tab */}
         {activeTab === "groupCalls" && (
           <div>
